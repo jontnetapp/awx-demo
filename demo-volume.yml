@@ -1,0 +1,32 @@
+---
+- name: Create a volume
+  hosts: localhost
+  gather_facts: no
+  connection: local
+
+  vars_files:
+    - demo-vars.yml
+
+  vars:
+    login: &login
+      hostname: "{{ netapp_hostname }}"
+      username: "{{ netapp_username}}"
+      password: "{{ netapp_password }}"
+      https: true
+      validate_certs: false
+
+  tasks:
+
+    - name: Create FlexVols
+      na_ontap_volume:
+        state: present
+        name: "{{ item.name }}"
+        aggregate_name: "{{ item.aggregate_name }}"
+        size: "{{ item.size }}"
+        size_unit: gb
+        space_guarantee: none
+        policy: default
+        percent_snapshot_space: 0
+        vserver: "{{ svm_name }}"
+        <<: *login
+      with_items: "{{ volumes }}"

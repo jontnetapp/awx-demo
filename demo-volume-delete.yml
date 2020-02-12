@@ -1,0 +1,26 @@
+---
+- name: Delete a volume
+  hosts: localhost
+  gather_facts: no
+  connection: local
+
+  vars_files:
+    - demo-vars.yml
+
+  vars:
+    login: &login
+      hostname: "{{ netapp_hostname }}"
+      username: "{{ netapp_username }}"
+      password: "{{ netapp_password }}"
+      https: true
+      validate_certs: false
+
+  tasks:
+
+    - name: Delete FlexVols
+      na_ontap_volume:
+        state: absent
+        name: "{{ item.name }}"
+        vserver: "{{ svm_name }}"
+        <<: *login
+      with_items: "{{ volumes }}"
